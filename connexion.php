@@ -5,41 +5,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>Ecoomerce</title>
+    <title>Connexion</title>
 </head>
 
 <body>
-    <?php
-    include 'includes/nav.php'; ?>
+    <?php include 'includes/nav.php'; ?>
     <div class="container py-2">
         <?php
-        if (isset($_POST['ajouter'])) {
+        if (isset($_POST['connexion'])) {
             $login = $_POST['login'];
-            $pwd = $_POST['possword'];
-
+            $pwd = $_POST['password'];
             if (!empty($login) && !empty($pwd)) {
-                require 'includes/database.php';
-                $date = date(format: 'y-m-d');
-                $request = $pdo->prepare('INSERT INTO utilisateur values (null,?,?,?)');
-                $reseult = $request->execute([$login, $pwd, $date]);
-                //Redirection 
-                header('location:connexion.php');
+                require_once 'includes/database.php';
+                $sqlstate = $pdo->prepare('SELECT * FROM utilisateur WHERE login =? AND password=?');
+                $result = $sqlstate->execute([$login, $pwd]);
+                if ($sqlstate->rowCount() >= 1) {
+                    $_SESSION['utilisateur'] = $sqlstate->fetch();
+                    header('location:admin.php');
+                }
             } else {
         ?>
                 <div class="alert alert-danger" role="alert">
-                    Login et mot de passe sont obligatoires!
+                    Login ou mot de passe incorrectes!
                 </div>
         <?php
             }
         }
         ?>
-        <h4>Ajouter Utilisateur </h4>
+        <h4>Connexion</h4>
         <form method="post">
             <label class="form-label">login</label>
             <input type="text" class="form-control" name="login">
             <label class="form-label">Password</label>
-            <input type="password" class="form-control" name="possword">
-            <input type="submit" value="Ajouter utilisateur" name="ajouter" class="btn btn-primary ptn-lg my-2">
+            <input type="password" class="form-control" name="password">
+            <input type="submit" value="Connexion" name="connexion" class="btn btn-primary ptn-lg my-2">
         </form>
     </div>
 </body>
